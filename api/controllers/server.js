@@ -6,6 +6,8 @@
 
 const OS = require('os');
 const Package = require("../../package.json");
+const fs = require('fs');
+const fileName = 'log_server.txt';
 function cpuAverage() {
 
   //Initialise sum of idle and time of cores and fetch CPU info
@@ -109,6 +111,12 @@ function getInfo(req, res, next) {
       },
       version: Package.version
     };
+    if(fs.stat(filename, (err, state) => {
+      if(err !== null){
+        fs.appendFileSync(fileName, "{log:");
+      }
+      fs.appendFileSync(fileName, JSON.stringify(info) + ",\n");
+    }))
     res.json(info);
   });
 }
