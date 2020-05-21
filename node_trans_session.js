@@ -10,11 +10,19 @@ const { spawn } = require('child_process');
 const dateFormat = require('dateformat');
 const mkdirp = require('mkdirp');
 const fs = require('fs');
+const logFile = '/logs/trans_session_log.txt';
 
 class NodeTransSession extends EventEmitter {
   constructor(conf) {
     super();
     this.conf = conf;
+  }
+  getHumanTs(){
+    let now = new Date();
+    return now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+  }
+  getStartLogObj(){
+    return this.getHumanTs() + ': {';
   }
 
   run() {
@@ -63,21 +71,30 @@ class NodeTransSession extends EventEmitter {
     Array.prototype.push.apply(argv, ['-f', 'tee', '-map', '0:a?', '-map', '0:v?', mapStr]);
     argv = argv.filter((n) => { return n }); //去空
     this.ffmpeg_exec = spawn(this.conf.ffmpeg, argv);
+    if(fs.stat(logFile, (err, state) => {
+      if(err !== null){
+        fs.appendFileSync(logFile, "{log:");
+      }
+    }))
     this.ffmpeg_exec.on('error', (e) => {
       Logger.ffdebug(e);
+      fs.appendFileSync(logFile, this.getStartLogObj() + ', type: "error",' + JSON.stringify(e) + "}");
     });
 
     this.ffmpeg_exec.stdout.on('data', (data) => {
       Logger.ffdebug(`FF输出：${data}`);
+      fs.appendFileSync(logFile, this.getStartLogObj() + ', type: "data",'  + JSON.stringify(data) + "}");
     });
 
     this.ffmpeg_exec.stderr.on('data', (data) => {
       Logger.ffdebug(`FF输出：${data}`);
+      fs.appendFileSync(logFile, this.getStartLogObj() + ', type: "stderr",'  + JSON.stringify(data) + "}");
     });
 
     this.ffmpeg_exec.on('close', (code) => {
       Logger.log('[Transmuxing end] ' + this.conf.streamPath);
       this.emit('end');
+      fs.appendFileSync(logFile, this.getStartLogObj() + ', type: "end",'  + JSON.stringify(code) + "}");
       fs.readdir(ouPath, function (err, files) {
         if (!err) {
           files.forEach((filename) => {
