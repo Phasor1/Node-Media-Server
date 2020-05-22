@@ -11,6 +11,7 @@ const dateFormat = require('dateformat');
 const mkdirp = require('mkdirp');
 const fs = require('fs');
 const logFile = __dirname + '\\logs\\trans_session_log.txt';
+const fetch = require('node-fetch');
 
 class NodeTransSession extends EventEmitter {
   constructor(conf) {
@@ -18,6 +19,8 @@ class NodeTransSession extends EventEmitter {
     this.conf = conf;
     this.readyArgv = [];
     this.ouPath = `${this.conf.mediaroot}/${this.conf.streamApp}/${this.conf.streamName}`;
+    this.urlsPCInfo = 'http://localhost:' + this.conf.port + '/api/server';
+    this.timerPCInfo = null;
   }
   getHumanTs(){
     let now = new Date();
@@ -72,6 +75,16 @@ class NodeTransSession extends EventEmitter {
     Array.prototype.push.apply(argv, ['-f', 'tee', '-map', '0:a?', '-map', '0:v?', mapStr]);
     this.readyArgv = argv.filter((n) => { return n }); //去空
     this.launchFFMPEGProcess();
+    // fetch(this.urlsPCInfo, {
+    //   credentials: 'include',
+    //   method: 'GET'
+    // })
+    //   .then(r => r.json())
+    //   .catch(e => console.log('error', e))
+    //   .then(r => console.log(r));
+    // this.timerPCInfo = setInterval(()=>{
+      
+    // }, 200)
   }
   launchFFMPEGProcess(){
     this.ffmpeg_exec = spawn(this.conf.ffmpeg, this.readyArgv);
@@ -96,7 +109,7 @@ class NodeTransSession extends EventEmitter {
     });
 
     this.ffmpeg_exec.on('close', (code) => {
-      Logger.log('[Transmuxing end] ' + this.conf.streamPath);
+      Logger.error('[Transmuxing end] ' + this.conf.streamPath);
       if(code !== null){
         fs.appendFileSync(logFile, this.getStartLogObj() + '[END] '  + code.toString());
       }

@@ -1,26 +1,36 @@
 {
-  "name": "node-media-server",
-  "version": "2.1.9",
-  "description": "A Node.js implementation of RTMP Server",
-  "main": "node_media_server.js",
-  "scripts": {
-    "test": "node app.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/illuspas/Node-Media-Server.git"
-  },
-  "keywords": [
-    "rtmp",
-    "flv",
-    "server"
+  "_args": [
+    [
+      "git+https://github.com/Phasor1/Node-Media-Server.git",
+      "C:\\Users\\Davide\\Desktop\\Lavoro\\Dotdotdot\\Ecotender\\repo\\cruiseplatform_backend\\streaming_server"
+    ]
   ],
-  "author": "Mingliang Chen",
-  "license": "MIT",
+  "_from": "git+https://github.com/Phasor1/Node-Media-Server.git",
+  "_id": "node-media-server@git+https://github.com/Phasor1/Node-Media-Server.git#2d7bc795a39cb5467b938ffad3fa963913eed1a0",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/node-media-server",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "git+https://github.com/Phasor1/Node-Media-Server.git",
+    "rawSpec": "git+https://github.com/Phasor1/Node-Media-Server.git",
+    "saveSpec": "git+https://github.com/Phasor1/Node-Media-Server.git",
+    "fetchSpec": "https://github.com/Phasor1/Node-Media-Server.git",
+    "gitCommittish": null
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "git+https://github.com/Phasor1/Node-Media-Server.git#2d7bc795a39cb5467b938ffad3fa963913eed1a0",
+  "_spec": "git+https://github.com/Phasor1/Node-Media-Server.git",
+  "_where": "C:\\Users\\Davide\\Desktop\\Lavoro\\Dotdotdot\\Ecotender\\repo\\cruiseplatform_backend\\streaming_server",
+  "author": {
+    "name": "Mingliang Chen"
+  },
   "bugs": {
     "url": "https://github.com/illuspas/Node-Media-Server/issues"
   },
-  "homepage": "https://github.com/illuspas/Node-Media-Server#readme",
   "dependencies": {
     "basic-auth-connect": "^1.0.0",
     "chalk": "^2.4.2",
@@ -30,7 +40,25 @@
     "mkdirp": "1.0.3",
     "ws": "^5.2.2"
   },
+  "description": "A Node.js implementation of RTMP Server",
   "engines": {
     "node": ">=8.0.0"
-  }
+  },
+  "homepage": "https://github.com/illuspas/Node-Media-Server#readme",
+  "keywords": [
+    "rtmp",
+    "flv",
+    "server"
+  ],
+  "license": "MIT",
+  "main": "node_media_server.js",
+  "name": "node-media-server",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/illuspas/Node-Media-Server.git"
+  },
+  "scripts": {
+    "test": "node app.js"
+  },
+  "version": "2.1.9"
 }
