@@ -111,12 +111,12 @@ function getInfo(req, res, next) {
       },
       version: Package.version
     };
-    if(fs.stat(filename, (err, state) => {
-      if(err !== null){
-        fs.appendFileSync(fileName, "{log:");
-      }
-      fs.appendFileSync(fileName, JSON.stringify(info) + ",\n");
-    }))
+    // if(fs.stat(filename, (err, state) => {
+    //   if(err !== null){
+    //     fs.appendFileSync(fileName, "{log:");
+    //   }
+    //   fs.appendFileSync(fileName, JSON.stringify(info) + ",\n");
+    // }))
     res.json(info);
   });
 }

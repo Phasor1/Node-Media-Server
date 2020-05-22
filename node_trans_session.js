@@ -11,7 +11,8 @@ const dateFormat = require('dateformat');
 const mkdirp = require('mkdirp');
 const fs = require('fs');
 const logFile = __dirname + '\\logs\\trans_session_log.txt';
-const fetch = require('node-fetch');
+const logFilePerformances = __dirname + '\\logs\\trans_session_perf_log.txt';
+const request = require('request');
 
 class NodeTransSession extends EventEmitter {
   constructor(conf) {
@@ -75,9 +76,21 @@ class NodeTransSession extends EventEmitter {
     Array.prototype.push.apply(argv, ['-f', 'tee', '-map', '0:a?', '-map', '0:v?', mapStr]);
     this.readyArgv = argv.filter((n) => { return n }); //去空
     this.launchFFMPEGProcess();
+    if(this.conf.writeLog){
+      this.timerPCInfo = setInterval(() => {
+        request.get(this.urlsPCInfo, (err, res, data) => {
+          if(err === null){
+            this.savePerformanceData(JSON.parse(data));
+          }
+        }).auth('admin', 'nms2018');
+      }, 1000);
+    }
     // fetch(this.urlsPCInfo, {
-    //   credentials: 'include',
-    //   method: 'GET'
+    //   headers: new Headers({
+    //    'Authorization': 'Basic '+btoa('admin:nms2018'), 
+    //    'Content-Type': 'application/x-www-form-urlencoded'
+    //  }), 
+    //   method: 'GET',
     // })
     //   .then(r => r.json())
     //   .catch(e => console.log('error', e))
@@ -86,34 +99,54 @@ class NodeTransSession extends EventEmitter {
       
     // }, 200)
   }
+  savePerformanceData(d){
+    let nDec = 3
+    let divide = (data, n, nDec) => (data/((1000*n))).toFixed(nDec) 
+    d.cpu.speed = divide(d.cpu.speed, 1, nDec);
+    d.mem.totle = divide(d.mem.totle, 3, nDec); 
+    d.mem.free = divide(d.mem.free, 3, nDec);
+    d.net.inbytes = divide(d.net.inbytes, 3, nDec);
+    d.net.outbytes = divide(d.net.outbytes, 3, nDec);
+    d.nodejs.mem.rss = divide(d.nodejs.mem.rss, 3, nDec);
+    d.nodejs.mem.heapTotal = divide(d.nodejs.mem.heapTotal, 3, nDec);
+    d.nodejs.mem.heapUsed = divide(d.nodejs.mem.heapUsed, 3, nDec);
+    d.nodejs.mem.external = divide(d.nodejs.mem.external, 3, nDec);
+    fs.appendFileSync(logFilePerformances, this.getStartLogObj() + '{performances: ' + JSON.stringify(d) + '}');
+  }
   launchFFMPEGProcess(){
     this.ffmpeg_exec = spawn(this.conf.ffmpeg, this.readyArgv);
-    if(fs.stat(logFile, (err, state) => {
-      if(err !== null){
-        fs.appendFileSync(logFile, "{log:");
-      }
-    }))
+    if(this.conf.writeLog){
+      fs.stat(logFile, (err, state) => {
+        if(err !== null){
+          fs.appendFileSync(logFile, "{log:");
+        }
+      })
+    }
     this.ffmpeg_exec.on('error', (e) => {
       Logger.ffdebug(e);
-      fs.appendFileSync(logFile, this.getStartLogObj() + '[ERROR] ' + Buffer.from(e).toString());
+      if(this.conf.writeLog) {fs.appendFileSync(logFile, this.getStartLogObj() + '[ERROR] ' + Buffer.from(e).toString());}
     });
 
     this.ffmpeg_exec.stdout.on('data', (data) => {
       Logger.ffdebug(`FF输出：${data}`);
-      fs.appendFileSync(logFile, this.getStartLogObj() + '[DATA] '  + Buffer.from(data).toString());
+      if(this.conf.writeLog) {fs.appendFileSync(logFile, this.getStartLogObj() + '[DATA] '  + Buffer.from(data).toString());}
     });
 
     this.ffmpeg_exec.stderr.on('data', (data) => {
       Logger.ffdebug(`FF输出：${data}`);
-      fs.appendFileSync(logFile, this.getStartLogObj() + '[STDERR] '  + Buffer.from(data).toString());
+      if(this.conf.writeLog) {fs.appendFileSync(logFile, this.getStartLogObj() + '[STDERR] '  + Buffer.from(data).toString());}
     });
 
     this.ffmpeg_exec.on('close', (code) => {
-      Logger.error('[Transmuxing end] ' + this.conf.streamPath);
+      Logger.log('[Transmuxing end] ' + this.conf.streamPath);
       if(code !== null){
-        fs.appendFileSync(logFile, this.getStartLogObj() + '[END] '  + code.toString());
+        if(this.conf.writeLog) {fs.appendFileSync(logFile, this.getStartLogObj() + '[END] '  + code.toString());}
       }
-      this.launchFFMPEGProcess();
+      if(this.conf.keepAliveFFMPEG){
+        this.launchFFMPEGProcess();
+      }else{
+        this.end();
+      }
     });
   }
   clearFiles(){
@@ -134,9 +167,9 @@ class NodeTransSession extends EventEmitter {
 
   end() {
     this.clearFiles();
-    this.emit('end');
     this.ffmpeg_exec.on('close',()=>{});
     this.ffmpeg_exec.kill();
+    this.emit('end');
   }
 }
 

@@ -66,6 +66,8 @@ class NodeTransServer {
       conf.streamName = name;
       conf.args = args;
       conf.port = this.config.http.port;
+      conf.writeLog = this.config.writeLog;
+      conf.keepAliveFFMPEG = this.config.keepAliveFFMPEG;
       if (app === conf.app) {
         let session = new NodeTransSession(conf);
         this.transSessions.set(id, session);
