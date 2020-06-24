@@ -143,6 +143,7 @@ class NodeTransSession extends EventEmitter {
         if(this.conf.writeLog) {fs.appendFileSync(logFile, this.getStartLogObj() + '[END] '  + code.toString());}
       }
       if(this.conf.keepAliveFFMPEG){
+	this.clearFiles();
         this.launchFFMPEGProcess();
       }else{
         this.end();
