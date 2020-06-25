@@ -10,8 +10,8 @@ const { spawn } = require('child_process');
 const dateFormat = require('dateformat');
 const mkdirp = require('mkdirp');
 const fs = require('fs');
-const logFile = __dirname + '\\logs\\trans_session_log.txt';
-const logFilePerformances = __dirname + '\\logs\\trans_session_perf_log.txt';
+const logFile = __dirname + '/logs/trans_session_log.txt';
+const logFilePerformances = __dirname + '/logs/trans_session_perf_log.txt';
 const request = require('request');
 
 class NodeTransSession extends EventEmitter {
