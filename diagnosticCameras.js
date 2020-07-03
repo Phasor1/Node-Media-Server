@@ -4,9 +4,11 @@
 const ping = require('ping');
 const {spawn} = require('child_process');
 var needle = require('needle');
+const EventEmitter = require('events');
 
-class DiagnosticCameras {
+class DiagnosticCameras extends EventEmitter{
 	constructor(config){
+		super();
 		this.config = config;
 		this.timerStreams = null;
 		this.streams = config.relay.tasks.map(el => el.edge);
@@ -18,9 +20,9 @@ class DiagnosticCameras {
 		this.numAttempts = 0;
 		this.numMaxAttempts = 5;
 		this.canCheck = true;
+		this.apiEndP = 'http://localhost:5070/api/streams';
 		this.streams.forEach(el => {
 			let addr = this.getIpFromUrl(el);
-			console.log(addr)
 			if(this.hosts.indexOf(addr) === -1) this.hosts.push(addr)
 		})
 		this.minStreams = (this.streams.length*2)+1;
@@ -28,6 +30,7 @@ class DiagnosticCameras {
 			usr: 'root',
 			pwd: 'ecotender'
 		}
+		console.log('hosts', this.hosts, 'streams', this.streams);
 		this.startTimerApiStreams();
 	}
 	getIpFromUrl(url){
@@ -40,13 +43,20 @@ class DiagnosticCameras {
 	            if(isAlive) {
 	            	alives.push(host);
 	            }
+	            console.log('alives', this.hosts, alives)
 	            if(i == this.hosts.length - 1 && this.hosts.length == alives.length){
-	            	this.restartCameras()
+	            	console.log('restarting', this.hosts, alives)
+	            	this.restartServer();
 	            }        
 	        });
 	    });
 	}
+	restartServer(){
+		this.stop();
+		this.run();
+	}
 	restartCameras(){
+		console.log('restart cameras')
 		this.hosts.forEach(ip => {
 			spawn('curl', '--digest -u "root:ecotender" http://' + ip + '/axis-cgi/restart.cgi');
 		})
@@ -58,21 +68,38 @@ class DiagnosticCameras {
 	startTimerApiStreams(){
 		this.timerStreams = setInterval(() => {
 			if(this.canCheck){
-				needle.get('http://localhost:5070/api/streams', (error, res) => {
+				needle.get(this.apiEndP, (error, res) => {
 				  	if (!error && res.statusCode == 200){
-				  		res = res.body;
-				  		let numStreams = this.streams.length;
-				  		let currNumStreams = 0;
-				  		config.relay.tasks.forEach(t => {
-				  			let currStream = numStres.body[t.app];
-				  			if(currStream !== undefined){
-				  				currNumStreams++;
+				  		let streams = res.body.cruiseplatform;
+				  		if(streams === undefined){
+				  			this.numAttempts++;
+				  			if(this.numAttempts == this.numMaxAttempts){
+				  				console.log('streams api response is empty')
+				  				this.numAttempts = 0;
+				  				this.checkIps();
 				  			}
-				  		})
-				  		// we miss a stream, call 
-				  		if(numStreams !== currNumStreams){
-				  			this.checkIps()
-				  		}
+				  		}else{
+					  		let streamsKeys = Object.keys(streams);
+					  		let currNumStreams = 0;
+				            streamsKeys.forEach(stream => {
+				                if(!this.isEmpty(streams[stream].publisher)) {
+				                    currNumStreams++;
+				                }
+				            });
+					  		// we miss a stream, check if cameras are available
+					  		if(this.streams.length !== currNumStreams){
+					  			console.log('attempt', this.numAttempts)
+					  			this.numAttempts++;
+
+					  			if(this.numAttempts == this.numMaxAttempts){
+					  				console.log('some streams missing')
+					  				this.numAttempts = 0;
+					  				this.checkIps();
+					  			}
+					  		}else{
+					  			this.numAttempts = 0;
+					  		}
+					  	}
 				  	}
 				});
 			}
@@ -110,6 +137,14 @@ class DiagnosticCameras {
 	stopTimer(){
 		clearInterval(this.timerStreams)
 	}
+	isEmpty(obj) {
+	    for(var key in obj) {
+	        if(obj.hasOwnProperty(key))
+	            return false;
+	    }
+	    return true;
+	}
+
 }
 module.exports = DiagnosticCameras;
 // 'curl --digest -u "root:ecotender" http://10.3.3.92/axis-cgi/restart.cgi'
