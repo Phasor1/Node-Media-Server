@@ -51,7 +51,7 @@ class DiagnosticCameras extends EventEmitter{
 	    });
 	}
 	restartServer(){
-		spawn('/home/davide/restart_pm2_streaming');
+		// spawn('/home/davide/restart_pm2_streaming');
 	}
 	restartCameras(){
 		console.log('restart cameras')
