@@ -30,7 +30,6 @@ class DiagnosticCameras extends EventEmitter{
 			usr: 'root',
 			pwd: 'ecotender'
 		}
-		console.log('hosts', this.hosts, 'streams', this.streams);
 		this.startTimerApiStreams();
 	}
 	getIpFromUrl(url){
@@ -52,8 +51,7 @@ class DiagnosticCameras extends EventEmitter{
 	    });
 	}
 	restartServer(){
-		this.stop();
-		this.run();
+		spawn('/home/davide/restart_pm2_streaming');
 	}
 	restartCameras(){
 		console.log('restart cameras')

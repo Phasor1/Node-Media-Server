@@ -1,0 +1,4 @@
+#!/bin/sh
+PATH=/home/davide/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/local/processing:/snap/bin:/home/davide/Android/Sdk/emulator:/home/davide/Android/Sdk/tools:/home/davide/Android/Sdk/tools/bin:/home/davide/Android/Sdk/platform-tools
+PM2_HOME=/home/davide/.pm2
+sleep 10 && pm2 restart streaming_server
