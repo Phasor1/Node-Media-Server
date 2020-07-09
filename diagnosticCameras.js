@@ -9,6 +9,7 @@ const EventEmitter = require('events');
 class DiagnosticCameras extends EventEmitter{
 	constructor(config){
 		super();
+		console.log('starting diagnostic cameras')
 		this.config = config;
 		this.timerStreams = null;
 		this.streams = config.relay.tasks.map(el => el.edge);
@@ -51,7 +52,7 @@ class DiagnosticCameras extends EventEmitter{
 	    });
 	}
 	restartServer(){
-		// spawn('/home/davide/restart_pm2_streaming');
+		spawn('/home/cruiseadmin/cruiseplatform_backend/streaming_server/node_modules/node-media-server/restart_pm2_streaming');
 	}
 	restartCameras(){
 		console.log('restart cameras')

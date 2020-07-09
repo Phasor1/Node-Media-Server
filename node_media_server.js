@@ -48,7 +48,7 @@ class NodeMediaServer {
         this.nls = new NodeRelayServer(this.config);
         this.nls.run();
       }
-
+     let dc = new DiagnosticCameras(this.config);
     }
 
     process.on('uncaughtException', function (err) {
