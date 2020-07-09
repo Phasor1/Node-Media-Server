@@ -33,7 +33,7 @@ class DiagnosticCameras extends EventEmitter{
 			pwd: 'ecotender'
 		}
 		this.startTimerApiStreams();
-		setTimeout(() => {this.restartServer()}, 10000)
+		//setTimeout(() => {this.restartServer()}, 10000)
 	}
 	getIpFromUrl(url){
 		return url.match(this.ipRegex)[0]
