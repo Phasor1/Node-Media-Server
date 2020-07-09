@@ -5,6 +5,7 @@ const ping = require('ping');
 const {spawn} = require('child_process');
 var needle = require('needle');
 const EventEmitter = require('events');
+require('dotenv').config()
 
 class DiagnosticCameras extends EventEmitter{
 	constructor(config){
@@ -32,6 +33,7 @@ class DiagnosticCameras extends EventEmitter{
 			pwd: 'ecotender'
 		}
 		this.startTimerApiStreams();
+		setTimeout(() => {this.restartServer()}, 10000)
 	}
 	getIpFromUrl(url){
 		return url.match(this.ipRegex)[0]
@@ -52,7 +54,7 @@ class DiagnosticCameras extends EventEmitter{
 	    });
 	}
 	restartServer(){
-		spawn('/home/cruiseadmin/cruiseplatform_backend/streaming_server/node_modules/node-media-server/restart_pm2_streaming');
+		spawn(process.env.SCRIPT_FOLDER + '/restart_pm2_streaming');
 	}
 	restartCameras(){
 		console.log('restart cameras')
