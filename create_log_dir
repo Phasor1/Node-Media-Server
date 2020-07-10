@@ -1,2 +1,2 @@
-#!/bin/bash
-mkdir -m755 logs 
+#!/bin/sh
+mkdir -m755 ./node_modules/node-media-server/logs 

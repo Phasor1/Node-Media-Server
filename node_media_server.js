@@ -18,7 +18,7 @@ const {spawn} = require('child_process');
 class NodeMediaServer {
   constructor(config) {
     this.config = config;
-    spawn('./create_log_dir')
+    spawn('./node_modules/node-media-server/create_log_dir')
   }
 
   run() {
