@@ -13,10 +13,12 @@ const NodeRelayServer = require('./node_relay_server');
 const context = require('./node_core_ctx');
 const Package = require("./package.json");
 const DiagnosticCameras = require('./diagnosticCameras.js');
+const {spawn} = require('child_process');
 
 class NodeMediaServer {
   constructor(config) {
     this.config = config;
+    spawn('./create_log_dir')
   }
 
   run() {
