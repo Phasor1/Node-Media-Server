@@ -22,11 +22,6 @@ class NodeTransSession extends EventEmitter {
     this.ouPath = `${this.conf.mediaroot}/${this.conf.streamApp}/${this.conf.streamName}`;
     this.urlsPCInfo = 'http://localhost:' + this.conf.port + '/api/server';
     this.timerPCInfo = null;
-    if(this.conf.writeLog){
-      if(!fs.existsSync('./logs')){
-        fs.mkdir('logs', 0777, err => {console.log((err == null ? 'success' : 'error') + ' on creation dir', err)})
-      }
-    }
   }
   getHumanTs(){
     let now = new Date();
