@@ -50,7 +50,9 @@ class NodeMediaServer {
         this.nls = new NodeRelayServer(this.config);
         this.nls.run();
       }
-     let dc = new DiagnosticCameras(this.config);
+      if(this.config.activeDiagnosticCameras){
+        let dc = new DiagnosticCameras(this.config);
+      }
     }
 
     process.on('uncaughtException', function (err) {
