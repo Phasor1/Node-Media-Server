@@ -88,7 +88,7 @@ class DiagnosticCameras extends EventEmitter{
 				                }
 				            });
 					  		// we miss a stream, check if cameras are available
-					  		if(this.streams.length !== currNumStreams){
+					  		if(this.streams.length > currNumStreams){
 					  			console.log('attempt', this.numAttempts)
 					  			this.numAttempts++;
 
